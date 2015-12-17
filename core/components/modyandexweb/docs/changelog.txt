@@ -1,0 +1,5 @@
+Changelog for modYandexWeb.
+
+1.0.0-beta
+==============
+- Created
