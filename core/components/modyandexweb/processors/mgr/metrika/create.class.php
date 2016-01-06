@@ -1,30 +1,36 @@
 <?php
 
 /**
- * Create an Item
+ * Create counter
  */
-class modYandexWebItemCreateProcessor extends modObjectCreateProcessor {
-	public $objectType = 'modYandexWebItem';
-	public $classKey = 'modYandexWebItem';
-	public $languageTopics = array('modyandexweb');
-	//public $permission = 'create';
+class modYandexWebMetrikaCounterCreateProcessor extends modObjectProcessor {
 
+	public function process(){
+		$this->modx->getService('modyandexweb','modYandexWeb', MODX_CORE_PATH.'components/modyandexweb/model/');
+		$ya = $this->modx->modyandexweb;
+		$counter_name = $this->getProperty('name');
+		$counter_url = $_SERVER['HTTP_HOST'];
 
-	/**
-	 * @return bool
-	 */
-	public function beforeSet() {
-		$name = trim($this->getProperty('name'));
-		if (empty($name)) {
-			$this->modx->error->addField('name', $this->modx->lexicon('modyandexweb_item_err_name'));
+		$url = 'https://api-metrika.yandex.ru/management/v1/counters';
+		$opt = array(
+			"counter" => array(
+				"name" => $counter_name,
+				"site" => $counter_url,
+			)
+		);
+
+		$results = $ya->yaRequest('POST', $url, $opt);
+		if($results['counter']){
+			$results['success'] = true;
+			$results['object'] = $results['counter'];
+		}else{
+			$results['success'] = false;
 		}
-		elseif ($this->modx->getCount($this->classKey, array('name' => $name))) {
-			$this->modx->error->addField('name', $this->modx->lexicon('modyandexweb_item_err_ae'));
-		}
-
-		return parent::beforeSet();
+		$results['data'] = array();
+		$resp = $results;
+		return json_encode($resp);
 	}
 
 }
 
-return 'modYandexWebItemCreateProcessor';
+return 'modYandexWebMetrikaCounterCreateProcessor';

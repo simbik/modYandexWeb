@@ -10,6 +10,7 @@ modYandexWeb.panel.Home = function (config) {
 		 getState:function() {return {activeTab:this.items.indexOf(this.getActiveTab())};},
 		 */
 		hideMode: 'offsets',
+		style: {margin: '0 0 0 20px'},
 		items: [{
 			html: '<h2>' + _('modyandexweb') + '</h2>',
 			cls: '',

@@ -4,7 +4,7 @@ modYandexWeb.utils.renderBoolean = function (value, props, row) {
 		: String.format('<span class="red">{0}</span>', _('no'));
 };
 
-modYandexWeb.utils.getMenu = function (actions, grid, selected) {
+modYandexWeb.utils.getMenu = function (actions, grid) {
 	var menu = [];
 	var cls, icon, title, action = '';
 
@@ -22,15 +22,6 @@ modYandexWeb.utils.getMenu = function (actions, grid, selected) {
 		}
 		else if (menu.length > 0 && /^remove/i.test(a['action'])) {
 			menu.push('-');
-		}
-
-		if (selected.length > 1) {
-			if (!a['multiple']) {
-				continue;
-			}
-			else if (typeof(a['multiple']) == 'string') {
-				a['title'] = a['multiple'];
-			}
 		}
 
 		cls = a['cls'] ? a['cls'] : '';

@@ -25,32 +25,23 @@ modYandexWeb.grid.Metrika = function (config) {
 			showPreview: true,
 			scrollOffset: 0,
 		},
-		paging: true,
+		paging: false,
 		remoteSort: true,
 		autoHeight: true,
 	});
 	modYandexWeb.grid.Metrika.superclass.constructor.call(this, config);
-
-	// Clear selection on grid refresh
-	this.store.on('load', function () {
-		if (this._getSelectedIds().length) {
-			this.getSelectionModel().clearSelections();
-		}
-	}, this);
 };
 Ext.extend(modYandexWeb.grid.Metrika, MODx.grid.Grid, {
 	windows: {},
 
 	getMenu: function (grid, rowIndex) {
-		var ids = this._getSelectedIds();
-
 		var row = grid.getStore().getAt(rowIndex);
-		var menu = modYandexWeb.utils.getMenu(row.data['actions'], this, ids);
+		var menu = modYandexWeb.utils.getMenu(row.data['actions'], this);
 
 		this.addContextMenuItem(menu);
 	},
 
-	/*createCounter: function (btn, e) {
+	createCounter: function (btn, e) {
 		var w = MODx.load({
 			xtype: 'modyandexweb-metrika-window-create',
 			id: Ext.id(),
@@ -63,7 +54,6 @@ Ext.extend(modYandexWeb.grid.Metrika, MODx.grid.Grid, {
 			}
 		});
 		w.reset();
-		w.setValues({active: true});
 		w.show(e.target);
 	},
 
@@ -106,35 +96,47 @@ Ext.extend(modYandexWeb.grid.Metrika, MODx.grid.Grid, {
 		});
 	},
 
-	removeCounter: function (act, btn, e) {
-		var ids = this._getSelectedIds();
-		if (!ids.length) {
+	checkCounter: function (act, btn, e) {
+		if (!this.menu.record)
 			return false;
-		}
-		MODx.msg.confirm({
-			title: ids.length > 1
-				? _('modyandexweb_metrika_remove')
-				: _('modyandexweb_counter_remove'),
-			text: ids.length > 1
-				? _('modyandexweb_metrika_remove_confirm')
-				: _('modyandexweb_counter_remove_confirm'),
-			url: this.config.url,
-			params: {
-				action: 'mgr/counter/remove',
-				ids: Ext.util.JSON.encode(ids),
-			},
-			listeners: {
-				success: {
-					fn: function (r) {
-						this.refresh();
-					}, scope: this
-				}
-			}
-		});
+        MODx.Ajax.request({
+            url: this.config.url,
+            params: {
+                action: 'mgr/metrika/check',
+                counter_id: this.menu.record.id
+            },
+            listeners: {
+                success: {
+                    fn: function (r) {
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        });
 		return true;
 	},
 
-	*/
+    removeCounter: function (act, btn, e) {
+        if (!this.menu.record)
+            return false;
+        MODx.msg.confirm({
+            title: _('modyandexweb_counter_remove'),
+            text: _('modyandexweb_counter_remove_confirm'),
+            url: this.config.url,
+            params: {
+                action: 'mgr/metrika/remove',
+                counter_id: this.menu.record.id,
+            },
+            listeners: {
+                success: {
+                    fn: function (r) {
+                        this.refresh();
+                    }, scope: this
+                }
+            }
+        });
+        return true;
+    },
 
 	getFields: function (config) {
 		return ['id', 'name', 'site', 'code_status', 'permission', 'actions'];
@@ -150,22 +152,28 @@ Ext.extend(modYandexWeb.grid.Metrika, MODx.grid.Grid, {
 			header: _('modyandexweb_counter_name'),
 			dataIndex: 'name',
 			sortable: true,
-			width: 200,
+			width: 100,
 		}, {
 			header: _('modyandexweb_counter_site'),
 			dataIndex: 'site',
 			sortable: false,
-			width: 200,
+			width: 100,
 		}, {
 			header: _('modyandexweb_counter_code_status'),
 			dataIndex: 'code_status',
 			sortable: false,
 			width: 100,
+            renderer:function(v) {
+                return _(v);
+            },
 		}, {
 			header: _('modyandexweb_counter_permission'),
 			dataIndex: 'permission',
 			sortable: false,
 			width: 100,
+            renderer:function(v) {
+                return _(v);
+            },
 		}, {
 			header: _('modyandexweb_grid_actions'),
 			dataIndex: 'actions',
@@ -179,9 +187,15 @@ Ext.extend(modYandexWeb.grid.Metrika, MODx.grid.Grid, {
 	getTopBar: function (config) {
 		return [{
 			text: '<i class="icon icon-plus"></i>&nbsp;' + _('modyandexweb_counter_create'),
-			handler: this.createItem,
+			handler: this.createCounter,
 			scope: this
-		}];
+		},'->',{
+            text: '<i class="icon icon-refresh"></i>',
+            handler: function(btn, e){
+                this.refresh();
+            },
+            scope: this
+        }];
 	},
 
 	onClick: function (e) {
@@ -203,20 +217,6 @@ Ext.extend(modYandexWeb.grid.Metrika, MODx.grid.Grid, {
 		return this.processEvent('click', e);
 	},
 
-	_getSelectedIds: function () {
-		var ids = [];
-		var selected = this.getSelectionModel().getSelections();
-
-		for (var i in selected) {
-			if (!selected.hasOwnProperty(i)) {
-				continue;
-			}
-			ids.push(selected[i]['id']);
-		}
-
-		return ids;
-	},
-
 	_doSearch: function (tf, nv, ov) {
 		this.getStore().baseParams.query = tf.getValue();
 		this.getBottomToolbar().changePage(1);
@@ -231,3 +231,30 @@ Ext.extend(modYandexWeb.grid.Metrika, MODx.grid.Grid, {
 	}
 });
 Ext.reg('modyandexweb-grid-metrika', modYandexWeb.grid.Metrika);
+
+modYandexWeb.window.CreateCounter = function(config) {
+    config = config || {};
+    this.ident = config.ident || 'metrika-create-' + Ext.id();
+    Ext.applyIf(config, {
+        title: _('modyandexweb_counter_create')
+        , id: this.ident
+        , autoHeight: true
+        , labelAlign: 'left'
+        , labelWidth: 180
+        , url: modYandexWeb.config.connector_url
+        , action: 'mgr/metrika/create'
+        , fields: [
+            {xtype: 'textfield', name: 'name', fieldLabel: _('modyandexweb_counter_name')}
+        ]
+        , keys: [{
+            key: Ext.EventObject.ENTER,
+            shift: true,
+            fn: function() {
+                this.submit()
+            }, scope: this
+        }]
+    });
+    modYandexWeb.window.CreateCounter.superclass.constructor.call(this, config);
+};
+Ext.extend(modYandexWeb.window.CreateCounter, MODx.Window);
+Ext.reg('modyandexweb-metrika-window-create', modYandexWeb.window.CreateCounter);

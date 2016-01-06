@@ -1,5 +1,6 @@
 <?php
 include_once 'setting.inc.php';
+include_once 'status.inc.php';
 
 $_lang['modyandexweb'] = 'modYandexWeb';
 $_lang['modyandexweb_menu_desc'] = 'Управление метрикой.';
@@ -20,6 +21,7 @@ $_lang['modyandexweb_counter_permission'] = 'Права доступа';
 $_lang['modyandexweb_counter_create'] = 'Добавить счетчик';
 $_lang['modyandexweb_counter_update'] = 'Обновить счетчик';
 $_lang['modyandexweb_counter_remove'] = 'Удалить счетчик';
+$_lang['modyandexweb_counter_check'] = 'Проверить статус счетчика';
 $_lang['modyandexweb_counter_showhtml'] = 'Показать код счетчика';
 
 $_lang['modyandexweb_counter_remove_confirm'] = 'Вы уверены, что хотите удалить этот счетчик?';

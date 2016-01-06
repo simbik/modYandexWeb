@@ -5,17 +5,22 @@ $settings = array();
 $tmp = array(
 	'app_id' => array(
 		'xtype' => 'textfield',
-		'value' => '51cb0b6d09f44eb487b26a2b7b1f94eb',
+		'value' => '2a6b4c5c629d432fac674c3dbb69770a',
 		'area' => 'modyandexweb_main',
 	),
 	'app_secret' => array(
 		'xtype' => 'textfield',
-		'value' => '48d4d6fe3c4544eeba4d564e160fce96',
+		'value' => 'dcd1233d354d43659d484835ab61246e',
 		'area' => 'modyandexweb_main',
 	),
 	'access_token' => array(
 		'xtype' => 'textfield',
-		'value' => '9239c603ff5f4c30955f804a18f2dcb2',
+		'value' => '2a49ad1b3bf34df0b2cc9bc2e2609123',
+		'area' => 'modyandexweb_main',
+	),
+	'advanced_mode' => array(
+		'xtype' => 'combo-boolean',
+		'value' => false,
 		'area' => 'modyandexweb_main',
 	),
 );

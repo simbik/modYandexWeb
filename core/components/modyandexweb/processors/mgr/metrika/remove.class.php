@@ -1,40 +1,23 @@
 <?php
 
 /**
- * Remove an Items
+ * Remove metrika
  */
-class modYandexWebItemRemoveProcessor extends modObjectProcessor {
-	public $objectType = 'modYandexWebItem';
-	public $classKey = 'modYandexWebItem';
-	public $languageTopics = array('modyandexweb');
-	//public $permission = 'remove';
+class modYandexWebMetrikaRemoveProcessor extends modObjectProcessor {
 
+	public function process(){
+		$this->modx->getService('modyandexweb','modYandexWeb', MODX_CORE_PATH.'components/modyandexweb/model/');
+		$ya = $this->modx->modyandexweb;
+		$counter_id = $this->getProperty('counter_id');
 
-	/**
-	 * @return array|string
-	 */
-	public function process() {
-		if (!$this->checkPermissions()) {
-			return $this->failure($this->modx->lexicon('access_denied'));
-		}
+		$url = 'https://api-metrika.yandex.ru/management/v1/counter/'.$counter_id;
 
-		$ids = $this->modx->fromJSON($this->getProperty('ids'));
-		if (empty($ids)) {
-			return $this->failure($this->modx->lexicon('modyandexweb_item_err_ns'));
-		}
+		$results = $ya->yaRequest('DELETE', $url);
 
-		foreach ($ids as $id) {
-			/** @var modYandexWebItem $object */
-			if (!$object = $this->modx->getObject($this->classKey, $id)) {
-				return $this->failure($this->modx->lexicon('modyandexweb_item_err_nf'));
-			}
-
-			$object->remove();
-		}
-
-		return $this->success();
+		$resp = $results;
+		return json_encode($resp);
 	}
 
 }
 
-return 'modYandexWebItemRemoveProcessor';
+return 'modYandexWebMetrikaRemoveProcessor';

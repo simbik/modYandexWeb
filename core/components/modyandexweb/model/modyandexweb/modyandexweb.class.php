@@ -81,9 +81,9 @@ class modYandexWeb {
 				$curlOpt[CURLOPT_INFILESIZE] = strlen($body);
 				break;
 			case 'POST':
-				$curlOpt[CURLOPT_HTTPHEADER] = array('Content-Type: application/x-www-form-urlencoded; charset=UTF-8;');
+				$curlOpt[CURLOPT_HTTPHEADER] = array('Content-Type: application/json; charset=UTF-8;');
 				$curlOpt[CURLOPT_POST] = true;
-				$curlOpt[CURLOPT_POSTFIELDS] = http_build_query($options);
+				$curlOpt[CURLOPT_POSTFIELDS] = json_encode($options);
 				break;
 			default:
 				throw new YandexApiException("Unsupported request method '$method'");
